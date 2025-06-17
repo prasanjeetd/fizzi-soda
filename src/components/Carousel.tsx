@@ -1,10 +1,22 @@
 'use client'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Bounded } from '@/components/Bounded';
-import { SodaCan, type SodaCanProps } from '@/components/SodaCan';
-import { gsap } from 'gsap';
+
 import { Center, Environment, View } from '@react-three/drei';
+import clsx from 'clsx';
+import { gsap } from 'gsap';
+import { SodaCan, type SodaCanProps } from '@/components/SodaCan';
 import FloatingCan from './FloatingCan';
+import { useGSAP } from '@gsap/react';
+import { ArrowIcon } from './ArrowIcon';
+import { WavyCircles } from './WavyCircles';
+// import { Group } from 'three/examples/jsm/libs/tween.module.js';
+
+
+
+
+const SPINS_ON_CHANGE = 8;
+
 
 const FLAVORS: {
     flavor: SodaCanProps["flavor"];
@@ -26,8 +38,36 @@ const FLAVORS: {
 const Carousel = () => {
     
    const[currentFlavorIndex, setCurrentFlavorIndex] = useState(0);
+
+   const sodaCanRef = useRef<Group>(null)
    function changeFlavor(index: number){
+    if(!sodaCanRef.current) return;
     const nextIndex = ( index + FLAVORS.length) % FLAVORS.length;
+    const tl = gsap.timeline();
+    tl.to(
+      sodaCanRef.current.rotation,{
+        y: index > currentFlavorIndex
+        ? `-=${Math.PI * 2 * SPINS_ON_CHANGE}`
+        : `+=${Math.PI * 2 * SPINS_ON_CHANGE}`,
+        ease: "power2.inOut",
+        duration: 1
+      }, 0
+    )
+    .to(".background, .wavy-circles-outer, .wavy-circles-inner",{
+      backgroundColor: FLAVORS[nextIndex].color,
+      fill: FLAVORS[nextIndex].color,
+      ease:"power2.inOut",
+      duration: 1
+    },0
+   )
+   .to(".text-wrapper", {
+    duration: .2, y:-10, opacity:0
+   }, 0)
+   .to(
+    {},
+    {onStart: ()=> setCurrentFlavorIndex(nextIndex)},
+    0.5)
+    .to(".text-wrapper", {duration:.2, y:0, opacity:1}, .7)
     setCurrentFlavorIndex(nextIndex);
    }     
         
@@ -36,23 +76,24 @@ const Carousel = () => {
     return (
         <section className="carousel bg-white relative h-screen text-white grid grid-rows-[auto,4fr,auto] overflow-hidden justify-center py-12">
             <div className="background pointer-events-none absolute inset-0 bg-[#715023] opacity-50" />
-               
+               <WavyCircles className='absolute left-1/2 top-1/2 h-[120vmin] -translate-x-1/2 -translate-y-1/2 text-[#710523]'/>
               <h2 className="relative text-center text-5xl font-bold">
                 Choose your Flavors
               </h2>
               
               <div className='grid grid-cols-3 items-center'>
                 {/* Left */}
-                <button
+                <ArrowButton
                 onClick={() => changeFlavor(currentFlavorIndex + 1)}
-                className='z-20 justify-self-end mr-4'
+                direction='left'
+                label='Previous Flavor'               
                 >
-                  Left
-                </button>
+                  
+                </ArrowButton>
                 {/* Can */}
                 <View className='aspect-square h-[70vmin] min-h-40'>
                   <Center position={[0,0,1.5]}>
-                  <FloatingCan floatIntensity={0.3} rotationIntensity={1}
+                  <FloatingCan ref={sodaCanRef} floatIntensity={0.3} rotationIntensity={1}
                   flavor={FLAVORS[currentFlavorIndex].flavor}
                   />
                   </Center>
@@ -61,12 +102,8 @@ const Carousel = () => {
                   <directionalLight position={[0, 1, 1]} intensity={6} />
                 </View>
                 {/* Right */}
-                <button
-                onClick={() => changeFlavor(currentFlavorIndex - 1)}
-                className='z-20 justify-self-start ml-4'
-                >
-                  Right
-                </button>
+                <ArrowButton onClick={() => changeFlavor(currentFlavorIndex - 1)} direction='right' label="Next Flavor"></ArrowButton>
+               
               </div>
 
               <div className='text-area relative mx-auto text-center'>
@@ -85,3 +122,23 @@ const Carousel = () => {
 };
 
 export default Carousel;
+
+type ArrowButtonProps = {
+  direction?: "right" | "left";
+  label: string;
+  onClick: ()=> void;
+}
+
+function ArrowButton({label, direction="right", onClick}:ArrowButtonProps){
+  return(
+    <button
+                onClick={onClick}
+                className='cursor-pointer size-12 rounded-full border-2 border-white bg-white/10 p-3 opacity-85 ring-white focus:outline-none focus-visible:opacity-100 focus-visible:ring-4 md:size-16 lg:size-20'
+                >
+                  <ArrowIcon className={clsx(direction === "right" && "-scale-x-100" )} />
+                  <span className='sr-only'> {label}</span>
+                
+                </button>
+  )
+}
+ 

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Hero from "@/components/Hero";
 import SkyDive from "@/components/SkyDive";
 import Carousel from "@/components/Carousel";
+import Alternating from "@/components/Alternating";
 
 export default function Home() {
   return (
@@ -21,6 +22,9 @@ export default function Home() {
       {/* Carousel Section - Separate from SkyDive */}
       <section className="w-full">
         <Carousel />
+      </section>
+      <section className="w-full">
+        <Alternating />
       </section>
     </div>
     
