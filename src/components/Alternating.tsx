@@ -7,9 +7,8 @@ import AlternatingCanScene from './AlternatingCanScene'
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 
-type Props = {}
 
-const Alternating = (props: Props) => {
+const Alternating = ({}: Props) => {
 
      const isDesktop = useMediaQuery("(min-width: 768px)", true);
   return (

@@ -4,6 +4,7 @@ import Hero from "@/components/Hero";
 import SkyDive from "@/components/SkyDive";
 import Carousel from "@/components/Carousel";
 import Alternating from "@/components/Alternating";
+import BigText from "@/components/BigText";
 
 export default function Home() {
   return (
@@ -25,6 +26,9 @@ export default function Home() {
       </section>
       <section className="w-full">
         <Alternating />
+      </section>
+      <section className="w-full">
+        <BigText />
       </section>
     </div>
     
