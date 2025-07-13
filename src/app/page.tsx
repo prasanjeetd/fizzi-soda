@@ -5,6 +5,9 @@ import SkyDive from "@/components/SkyDive";
 import Carousel from "@/components/Carousel";
 import Alternating from "@/components/Alternating";
 import BigText from "@/components/BigText";
+import { Titanic } from "@/components/Titanic";
+import TitanicScene from "@/components/TitanicScene";
+
 
 export default function Home() {
   return (
@@ -29,6 +32,9 @@ export default function Home() {
       </section>
       <section className="w-full">
         <BigText />
+      </section>
+      <section className="w-full">
+        <TitanicScene />
       </section>
     </div>
     
